@@ -52,10 +52,9 @@ module l2_ram_multi_bank #(
        assign interleaved_addresses[i] = mem_slave[i].add - `SOC_MEM_MAP_TCDM_START_ADDR;
 
       `ifndef PULP_FPGA_EMUL
-          generic_memory #(
+          generic_memory_dift #(
             .ADDR_WIDTH ( INTL_MEM_ADDR_WIDTH ),
-            .DATA_WIDTH ( 36                  ),
-            .BYTE_WIDTH ( BYTE_WIDTH          )
+            .DATA_WIDTH ( 32                  )
             ) bank_i (
             .CLK   ( clk_i                                             ),
             .INITN ( 1'b1                                              ),
@@ -64,8 +63,10 @@ module l2_ram_multi_bank #(
             .WEN   ( mem_slave[i].wen                                  ),
             .A     ( interleaved_addresses[i][INTL_MEM_ADDR_WIDTH+2+$clog2(NB_BANKS)-1:2+$clog2(NB_BANKS)] ), // Remove LSBs for byte addressing (2 bits)
                                                                                                               // and bank selection (log2(NB_BANKS) bits)
-            .D     ( mem_slave[i].wdata                                ),
-            .Q     ( mem_slave[i].r_rdata                              )
+            .D     ( mem_slave[i].wdata[31:0]                          ),
+            .DTAG  ( mem_slave[i].wdata[35:32]                         ),
+            .Q     ( mem_slave[i].r_rdata[31:0]                        ),
+            .QTAG  ( mem_slave[i].r_rdata[35:32]                       )
             );
 
       `else // !`ifndef PULP_FPGA_EMUL
@@ -99,10 +100,9 @@ module l2_ram_multi_bank #(
     logic [31:0] pri0_address;
     assign pri0_address = mem_pri_slave[0].add - `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR;
    `ifndef PULP_FPGA_EMUL
-    generic_memory #(
+    generic_memory_dift #(
       .ADDR_WIDTH ( PRI0_MEM_ADDR_WIDTH ),
-      .DATA_WIDTH ( 36                  ),
-      .BYTE_WIDTH ( BYTE_WIDTH          )
+      .DATA_WIDTH ( 32                  )
    ) bank_sram_pri0_i (
       .CLK   ( clk_i                                 ),
       .INITN ( 1'b1                                  ),
@@ -110,8 +110,10 @@ module l2_ram_multi_bank #(
       .BEN   ( ~mem_pri_slave[0].be                  ),
       .WEN   ( mem_pri_slave[0].wen                  ),
       .A     ( pri0_address[PRI0_MEM_ADDR_WIDTH+1:2] ), //Convert from byte to word addressing
-      .D     ( mem_pri_slave[0].wdata                ),
-      .Q     ( mem_pri_slave[0].r_rdata              )
+      .D     ( mem_pri_slave[0].wdata[31: 0]         ),
+      .DTAG  ( mem_pri_slave[0].wdata[35:32]         ),
+      .Q     ( mem_pri_slave[0].r_rdata[31: 0]       ),
+      .QTAG  ( mem_pri_slave[0].r_rdata[35:32]       )
    );
    `else // !`ifndef PULP_FPGA_EMUL
    fpga_private_ram #(.ADDR_WIDTH(PRI0_MEM_ADDR_WIDTH)) bank_sram_pri0_i
@@ -143,10 +145,9 @@ module l2_ram_multi_bank #(
     logic [31:0] pri1_address;
     assign pri1_address = mem_pri_slave[1].add - `SOC_MEM_MAP_PRIVATE_BANK1_START_ADDR;
    `ifndef PULP_FPGA_EMUL
-    generic_memory #(
+    generic_memory_dift #(
       .ADDR_WIDTH ( PRI1_MEM_ADDR_WIDTH ),
-      .DATA_WIDTH ( 36                  ),
-      .BYTE_WIDTH ( BYTE_WIDTH          )
+      .DATA_WIDTH ( 32                  )
    ) bank_sram_pri1_i (
       .CLK   ( clk_i                                 ),
       .INITN ( 1'b1                                  ),
@@ -154,8 +155,10 @@ module l2_ram_multi_bank #(
       .BEN   ( ~mem_pri_slave[1].be                  ),
       .WEN   ( mem_pri_slave[1].wen                  ),
       .A     ( pri1_address[PRI1_MEM_ADDR_WIDTH+1:2] ), //Convert from byte to word addressing
-      .D     ( mem_pri_slave[1].wdata                ),
-      .Q     ( mem_pri_slave[1].r_rdata              )
+      .D     ( mem_pri_slave[1].wdata[31: 0]         ),
+      .DTAG  ( mem_pri_slave[1].wdata[35:32]         ),
+      .Q     ( mem_pri_slave[1].r_rdata[31: 0]       ),
+      .QTAG  ( mem_pri_slave[1].r_rdata[35:32]       )
    );
    `else // !`ifndef PULP_FPGA_EMUL
    fpga_private_ram #(.ADDR_WIDTH(PRI1_MEM_ADDR_WIDTH)) bank_sram_pri1_i
