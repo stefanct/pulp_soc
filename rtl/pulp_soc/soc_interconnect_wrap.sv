@@ -114,6 +114,15 @@ module soc_interconnect_wrap
        '{ idx: 0, start_addr: `SOC_MEM_MAP_AXI_PLUG_START_ADDR,    end_addr: `SOC_MEM_MAP_AXI_PLUG_END_ADDR},
        '{ idx: 1, start_addr: `SOC_MEM_MAP_PERIPHERALS_START_ADDR, end_addr: `SOC_MEM_MAP_PERIPHERALS_END_ADDR}};
 
+    // DIFT (HW TAG INIT)
+    // index 0 = no override
+    // index 1 = override with SET tag
+    // index 2 = override with UNSET tag
+    localparam NR_RULES_TAG_BIT_OVERRIDE = 2;
+    localparam addr_map_rule_t [NR_RULES_TAG_BIT_OVERRIDE-1:0] RULES_TAG_BIT_OVERRIDE = '{
+       '{ idx: 1 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_END_ADDR},
+       '{ idx: 1 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_END_ADDR}};
+
     //For legacy reasons, the fc_data port can alias the address prefix 0x000 to 0x1c0. E.g. an access to 0x00001234 is
     //mapped to 0x1c001234. The following lines perform this remapping.
     XBAR_TCDM_BUS tcdm_fc_data_addr_remapped();
@@ -213,7 +222,8 @@ module soc_interconnect_wrap
                        .AXI_MASTER_ID_WIDTH(1), //Doesn't need to be changed. All axi masters in the current
                                                 //interconnect come from a TCDM protocol converter and thus do not have and AXI ID.
                                                 //However, the unerlaying IPs do not support an ID lenght of 0, thus we use 1.
-                       .AXI_USER_WIDTH(AXI_USER_WIDTH)
+                       .AXI_USER_WIDTH(AXI_USER_WIDTH),
+                       .NR_ADDR_RULES_TAG_BIT_OVERRIDE(NR_RULES_TAG_BIT_OVERRIDE)
                        ) i_soc_interconnect (
                                              .clk_i,
                                              .rst_ni,
@@ -226,7 +236,8 @@ module soc_interconnect_wrap
                                              .addr_space_contiguous(CONTIGUOUS_CROSSBAR_RULES),
                                              .contiguous_slaves(contiguous_slaves),
                                              .addr_space_axi(AXI_CROSSBAR_RULES),
-                                             .axi_slaves(axi_slaves)
+                                             .axi_slaves(axi_slaves),
+                                             .rules_tag_bit_override(RULES_TAG_BIT_OVERRIDE)
                                              );
 
 

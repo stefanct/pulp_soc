@@ -65,6 +65,7 @@ components:
     rtl/components/scm_2048x32.sv,
     rtl/components/scm_512x32.sv,
     rtl/components/tcdm_arbiter_2x1.sv,
+    rtl/components/dift_tag_bit_override.sv
   ]
 
 components_rtl:

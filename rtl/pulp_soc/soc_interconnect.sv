@@ -48,7 +48,9 @@ module soc_interconnect
                                                                                                     //width of the AXI slaves is clog2(NR_AXI_MASTERS) larger than the master id width since the
                                                                                                     //axi_mux in the XBAR will append an identificatoin tag to the outgoing transactions
                                                                                                     //towards the axi slaves so it can backroute the responses
-      parameter int unsigned  AXI_USER_WIDTH
+      parameter int unsigned  AXI_USER_WIDTH,
+      // Tag Bit Override rules
+      parameter int unsigned  NR_ADDR_RULES_TAG_BIT_OVERRIDE
       )
     (
      input logic                                                 clk_i,
@@ -65,8 +67,9 @@ module soc_interconnect
      XBAR_TCDM_BUS_36.Master                                     contiguous_slaves[NR_SLAVE_PORTS_CONTIG],
      //AXI Slave
      input addr_map_rule_t [NR_ADDR_RULES_AXI_SLAVE_PORTS-1:0]   addr_space_axi,
-     AXI_BUS.Master                                              axi_slaves[NR_AXI_SLAVE_PORTS] //AXI_ID width must be
+     AXI_BUS.Master                                              axi_slaves[NR_AXI_SLAVE_PORTS],//AXI_ID width must be
                                                                                                 //at least clog2(NR_AXI_SLAVES)
+     input addr_map_rule_t[NR_ADDR_RULES_TAG_BIT_OVERRIDE-1:0]   rules_tag_bit_override
      );
 
 
@@ -79,6 +82,8 @@ module soc_interconnect
     XBAR_TCDM_BUS_36 l2_demux_2_interleaved_xbar[NR_MASTER_PORTS]();
     XBAR_TCDM_BUS_36 l2_demux_2_contiguous_xbar[NR_MASTER_PORTS]();
     XBAR_TCDM_BUS    l2_demux_2_axi_bridge[NR_MASTER_PORTS]();
+
+    XBAR_TCDM_BUS_36 master_ports_2_l2_demux[NR_MASTER_PORTS]();
 
     //////////////////////
     // L2 Demultiplexer //
@@ -97,6 +102,13 @@ module soc_interconnect
         `TCDM_ASSIGN_INTF(l2_demux_2_contiguous_xbar[i], demux_slaves[1]);
         `TCDM_ASSIGN_INTF(l2_demux_2_interleaved_xbar[i], demux_slaves[2]);
 
+        dift_tag_bit_override #(
+                                .NR_ADDR_MAP_RULES(NR_ADDR_RULES_TAG_BIT_OVERRIDE)
+                               ) i_tag_bit_override(
+                                                    .slave(master_ports[i]),
+                                                    .master(master_ports_2_l2_demux[i]),
+                                                    .addr_map_rules(rules_tag_bit_override)
+                                                    );
 
         tcdm_demux #(
                      .NR_OUTPUTS(3),
@@ -106,7 +118,7 @@ module soc_interconnect
                                   .rst_ni,
                                   .test_en_i,
                                   .addr_map_rules(addr_space_l2_demux),
-                                  .master_port(master_ports[i]),
+                                  .master_port(master_ports_2_l2_demux[i]),
                                   .slave_ports(demux_slaves)
                                   );
     end
