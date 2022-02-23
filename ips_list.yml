@@ -118,7 +118,9 @@ hwpe-mac-engine:
   commit: v1.2
   domain: [cluster, soc]
 riscv-dbg:
-  commit: v0.2
+  commit: v0.2-bscane
+  server: https://github.com
+  group:  stefanct
   domain: [soc]
 register_interface:
   server: https://github.com
