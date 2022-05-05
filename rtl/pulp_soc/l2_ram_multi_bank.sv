@@ -77,10 +77,15 @@ module l2_ram_multi_bank #(
                .csn_i   (~mem_slave[i].req                                 ),
                .wen_i   (mem_slave[i].wen                                  ),
                .be_i    (mem_slave[i].be                                   ),
-               .addr_i  (interleaved_addresses[i][INTL_MEM_ADDR_WIDTH-1+2+$clog2(NB_BANKS):2+$clog2(NB_BANKS)] ), // Remove LSBs for byte addressing (2 bits)
-                                                                                                                  // and bank selection (log2(NB_BANKS) bits)
-               .wdata_i (mem_slave[i].wdata                                ),
-               .rdata_o (mem_slave[i].r_rdata                              )
+               .addr_i  (interleaved_addresses[i][INTL_MEM_ADDR_WIDTH-1+2+$clog2(NB_BANKS):2+$clog2(NB_BANKS)] ), // Remove LSBs for byte addressing (2 bits),
+               .wdata_i ( { mem_slave[i].wdata[35], mem_slave[i].wdata[31:24],
+                            mem_slave[i].wdata[34], mem_slave[i].wdata[23:16],
+                            mem_slave[i].wdata[33], mem_slave[i].wdata[15: 8],
+                            mem_slave[i].wdata[32], mem_slave[i].wdata[ 7: 0] }),
+               .rdata_o ( { mem_slave[i].r_rdata[35], mem_slave[i].r_rdata[31:24],
+                            mem_slave[i].r_rdata[34], mem_slave[i].r_rdata[23:16],
+                            mem_slave[i].r_rdata[33], mem_slave[i].r_rdata[15: 8],
+                            mem_slave[i].r_rdata[32], mem_slave[i].r_rdata[ 7: 0] })
                );
       `endif
    end
@@ -124,8 +129,14 @@ module l2_ram_multi_bank #(
         .wen_i   ( mem_pri_slave[0].wen                  ),
         .be_i    ( mem_pri_slave[0].be                   ),
         .addr_i  ( pri0_address[PRI0_MEM_ADDR_WIDTH+1:2] ), //Convert from byte to word addressing
-        .wdata_i ( mem_pri_slave[0].wdata                ),
-        .rdata_o ( mem_pri_slave[0].r_rdata              )
+        .wdata_i ( { mem_pri_slave[0].wdata[35], mem_pri_slave[0].wdata[31:24],
+                     mem_pri_slave[0].wdata[34], mem_pri_slave[0].wdata[23:16],
+                     mem_pri_slave[0].wdata[33], mem_pri_slave[0].wdata[15: 8],
+                     mem_pri_slave[0].wdata[32], mem_pri_slave[0].wdata[ 7: 0] }),
+        .rdata_o ( { mem_pri_slave[0].r_rdata[35], mem_pri_slave[0].r_rdata[31:24],
+                     mem_pri_slave[0].r_rdata[34], mem_pri_slave[0].r_rdata[23:16],
+                     mem_pri_slave[0].r_rdata[33], mem_pri_slave[0].r_rdata[15: 8],
+                     mem_pri_slave[0].r_rdata[32], mem_pri_slave[0].r_rdata[ 7: 0] })
         );
    `endif // !`ifndef PULP_FPGA_EMUL
 
@@ -169,8 +180,14 @@ module l2_ram_multi_bank #(
         .wen_i   ( mem_pri_slave[1].wen                  ),
         .be_i    ( mem_pri_slave[1].be                   ),
         .addr_i  ( pri1_address[PRI1_MEM_ADDR_WIDTH+1:2] ), //Convert from byte to word addressing
-        .wdata_i ( mem_pri_slave[1].wdata                ),
-        .rdata_o ( mem_pri_slave[1].r_rdata              )
+        .wdata_i ( { mem_pri_slave[1].wdata[35], mem_pri_slave[1].wdata[31:24],
+                     mem_pri_slave[1].wdata[34], mem_pri_slave[1].wdata[23:16],
+                     mem_pri_slave[1].wdata[33], mem_pri_slave[1].wdata[15: 8],
+                     mem_pri_slave[1].wdata[32], mem_pri_slave[1].wdata[ 7: 0] }),
+        .rdata_o ( { mem_pri_slave[1].r_rdata[35], mem_pri_slave[1].r_rdata[31:24],
+                     mem_pri_slave[1].r_rdata[34], mem_pri_slave[1].r_rdata[23:16],
+                     mem_pri_slave[1].r_rdata[33], mem_pri_slave[1].r_rdata[15: 8],
+                     mem_pri_slave[1].r_rdata[32], mem_pri_slave[1].r_rdata[ 7: 0] })
         );
    `endif
 
