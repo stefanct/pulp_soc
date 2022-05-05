@@ -118,10 +118,12 @@ module soc_interconnect_wrap
     // index 0 = no override
     // index 1 = override with SET tag
     // index 2 = override with UNSET tag
-    localparam NR_RULES_TAG_BIT_OVERRIDE = 2;
+    localparam NR_RULES_TAG_BIT_OVERRIDE = 3;
     localparam addr_map_rule_t [NR_RULES_TAG_BIT_OVERRIDE-1:0] RULES_TAG_BIT_OVERRIDE = '{
-       '{ idx: 1 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_END_ADDR},
-       '{ idx: 1 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_END_ADDR}};
+            '{ idx: 0 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC1_END_ADDR},
+            '{ idx: 0 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_SET_SEC2_END_ADDR},
+            '{ idx: 2 , start_addr: `SOC_MEM_MAP_TAG_OVERRIDE_UNSET_SEC1_START_ADDR , end_addr: `SOC_MEM_MAP_TAG_OVERRIDE_UNSET_SEC1_END_ADDR}
+    };
 
     //For legacy reasons, the fc_data port can alias the address prefix 0x000 to 0x1c0. E.g. an access to 0x00001234 is
     //mapped to 0x1c001234. The following lines perform this remapping.
@@ -164,13 +166,13 @@ module soc_interconnect_wrap
     //`TCDM_ASSIGN_INTF(master_ports[2], tcdm_udma_tx)
     //`TCDM_ASSIGN_INTF(master_ports[3], tcdm_udma_rx)
     //`TCDM_ASSIGN_INTF(master_ports[4], tcdm_debug)
-    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) )
+    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b0) )
                               i_tcdm_bus_convert_tcdm_udma_tx( .slave_32(tcdm_udma_tx), .master_36(master_ports[2]) );
-    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) )
+    tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b0) )
                               i_tcdm_bus_convert_tcdm_udma_rx( .slave_32(tcdm_udma_rx), .master_36(master_ports[3]) );
     tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b0) )
                               i_tcdm_bus_convert_tcdm_debug( .slave_32(tcdm_debug), .master_36(master_ports[4]) );
-    
+
 
     //Assign the 4 master ports from the AXI plug to the interface array
 
@@ -180,14 +182,14 @@ module soc_interconnect_wrap
     `define NR_SOC_TCDM_MASTER_PORTS 5
     for (genvar i = 0; i < 4; i++) begin
         //`TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i], axi_bridge_2_interconnect[i])
-        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) )
+        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b0) )
                                   i_tcdm_bus_convert_axi_bridge_2_interconnect( .slave_32(axi_bridge_2_interconnect[i]),
                                                                                 .master_36(master_ports[`NR_SOC_TCDM_MASTER_PORTS + i]) );
     end
-    
+
     XBAR_TCDM_BUS_36 master_ports_interleaved_only [NR_HWPE_PORTS]();
     for (genvar i = 0; i < NR_HWPE_PORTS; i++) begin
-        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b1) )
+        tcdm_bus_convert_32_to_36 #( .TAG_BITS_WRITE_VALUE(1'b0) )
                                   i_tcdm_bus_convert_tcdm_hwpe( .slave_32(tcdm_hwpe[i]), .master_36(master_ports_interleaved_only[i]) );
     end
 
