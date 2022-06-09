@@ -224,8 +224,7 @@ module soc_interconnect_wrap
                        .AXI_MASTER_ID_WIDTH(1), //Doesn't need to be changed. All axi masters in the current
                                                 //interconnect come from a TCDM protocol converter and thus do not have and AXI ID.
                                                 //However, the unerlaying IPs do not support an ID lenght of 0, thus we use 1.
-                       .AXI_USER_WIDTH(AXI_USER_WIDTH),
-                       .NR_ADDR_RULES_TAG_BIT_OVERRIDE(NR_RULES_TAG_BIT_OVERRIDE)
+                       .AXI_USER_WIDTH(AXI_USER_WIDTH)
                        ) i_soc_interconnect (
                                              .clk_i,
                                              .rst_ni,
@@ -238,8 +237,7 @@ module soc_interconnect_wrap
                                              .addr_space_contiguous(CONTIGUOUS_CROSSBAR_RULES),
                                              .contiguous_slaves(contiguous_slaves),
                                              .addr_space_axi(AXI_CROSSBAR_RULES),
-                                             .axi_slaves(axi_slaves),
-                                             .rules_tag_bit_override(RULES_TAG_BIT_OVERRIDE)
+                                             .axi_slaves(axi_slaves)
                                              );
 
 
