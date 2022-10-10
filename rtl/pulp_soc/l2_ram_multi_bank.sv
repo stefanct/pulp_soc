@@ -11,8 +11,7 @@
 `include "soc_mem_map.svh"
 
 module l2_ram_multi_bank #(
-   parameter NB_BANKS                   = 4,
-   parameter BYTE_WIDTH                 = 8
+   parameter NB_BANKS                   = 4
 ) (
    input logic              clk_i,
    input logic              rst_ni,

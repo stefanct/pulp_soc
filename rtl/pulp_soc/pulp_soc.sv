@@ -507,8 +507,7 @@ module pulp_soc import dm::*; #(
     //********************************************************
 
     l2_ram_multi_bank #(
-        .NB_BANKS              ( NB_L2_BANKS ),
-        .BYTE_WIDTH            ( 9           )
+        .NB_BANKS              ( NB_L2_BANKS )
     ) l2_ram_i (
         .clk_i           ( s_soc_clk          ),
         .rst_ni          ( s_soc_rstn         ),
